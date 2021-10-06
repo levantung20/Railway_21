@@ -2,7 +2,7 @@ DROP DATABASE IF EXISTS Freshe_12;
 CREATE DATABASE Freshe_12;
 USE Freshe_12;
 
- -- Create table Trainee--
+-- Question 1: Tạo table với các ràng buộc và kiểu dữ liệu
  DROP TABLE IF EXISTS Trainee;
  CREATE TABLE Trainee(
 		TraineeID 		TINYINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -15,7 +15,7 @@ USE Freshe_12;
 		Training_Class	NVARCHAR(50)  NOT NULL,
 		Evaluation_Notes	NVARCHAR(50) NOT NULL
  );
- 
+ -- Question 2: Thêm ít nhất 10 bản ghi vào table
  INSERT INTO Trainee(TraineeID , Full_Name, Birth_Date, Gender, ET_IQ, ET_Gmath, ET_English, Training_Class, Evaluation_Notes)
  VALUES (1,	'Lê Hồng Duyên',	'1995-12-08',	'MALE',	'12',	'13',	'48',	'VTI008',	'DHBKHN'),
 (2,'Lê Văn Tùng',	'1999-02-21',	'FEMALE',	'0',	'12',	'18',	'VTI004',	'DHKTQD'),
@@ -75,3 +75,87 @@ WHERE length(Full_Name) = (SELECT MAX(length(Full_Name)) FROM Trainee);
 SELECT  Full_Name, ET_IQ, ET_Gmath, ET_English
 FROM Trainee
 WHERE length(Full_Name) =(SELECT MAX(length(Full_Name)) FROM Trainee);
+
+
+-- Question 13 Lấy ra 5 thực tập sinh có tuổi nhỏ nhất
+SELECT *, year(curdate()) - year(birth_date) as Age
+FROM Trainee
+ORDER BY Age
+LIMIT 5;
+
+-- Question 14: Viết lệnh để lấy ra tất cả các thực tập sinh là ET, 1 ET thực tập sinh là những người thỏa mãn số điểm như sau:
+-- 			ET_IQ + ET_Gmath>=30
+-- 			ET_IQ>=8
+-- 			ET_Gmath>=8
+-- 			ET_English>=18
+SELECT Full_Name
+FROM Trainee
+WHERE ET_IQ >=8 AND ET_Gmath>=8 AND ET_English >=18 AND(ET_IQ +ET_Gmath) >=30;
+
+-- Question 15: Xóa thực tập sinh có TraineeID = 3
+DELETE FROM Trainee WHERE TraineeID = 3;
+-- Question 16: Xóa thực tập sinh có tổng điểm ET_IQ, ET_Gmath <=15
+DELETE FROM Trainee WHERE ET_IQ +ET_Gmath <=15;
+
+-- Question 17: Xóa thực tập sinh quá 30 tuổi.
+DELETE
+FROM Trainee
+WHERE year(curdate()) - year(birth_date) >30;
+-- Question 18: Thực tập sinh có TraineeID = 3 được chuyển sang lớp " VTI003". Hãy cập nhật thông tin vào database
+UPDATE 		Trainee
+SET
+			Training_Class = "VTI003"
+WHERE		TraineeID = 3;
+-- Question 19: Do có sự nhầm lẫn khi nhập liệu nên thông tin của học sinh số 10 đang bị sai, hãy cập nhật lại tên thành “LeVanA”, điểm ET_IQ =10, điểm ET_Gmath =15, điểm ET_English = 30.
+
+UPDATE 		Trainee
+SET
+			Full_Name = "Lê Văn A", ET_IQ = 10 , ET_Gmath = 15, ET_English =30
+WHERE		TraineeID = 10 ;
+-- Question 20: Đếm xem trong lớp VTI002 có bao nhiêu thực tập sinh.9(20,21 đề bài là 1)
+SELECT 		 Training_Class,COUNT(1) as Number_of_Trainee
+FROM 		Trainee
+WHERE		Training_Class = 'VTI002'
+GROUP BY	Training_Class ;
+
+
+-- Question 22: Đếm tổng số thực tập sinh trong lớp VTI002 và VTI008 có bao nhiêu thực tập sinh.
+SELECT  COUNT(1) as Number_of_Trainee
+FROM 	Trainee
+GROUP BY  Training_Class HAVING Training_Class ='VTI004' OR Training_Class = 'VTI008';
+
+-- Question 23: Lấy ra số lượng các thực tập sinh theo giới tính: Male, Female, Unknown.
+SELECT 	Gender, COUNT(1)
+FROM 	Trainee
+GROUP BY Gender;
+-- Question 25: Lấy ra lớp có lớn hơn 4 thực tập viên(câu 24,25 đề bài là 1)
+SELECT	Training_Class,COUNT(1) as Number_of_Trainee
+FROM 	Trainee
+GROUP BY	Training_Class HAVING COUNT(1) >=4;
+-- Question 26: Lấy ra trường có ít hơn 4 thực tập viên tham gia khóa học
+SELECT Training_Class, COUNT(1) AS Number_of_Trainee
+FROM 	Trainee
+GROUP BY 	Training_Class HAVING COUNT(1) <4;
+
+/* Question 27: Bước 1: Lấy ra danh sách thông tin ID, Fullname, lớp thực tập viên có lớp
+'VTI002'
+Bước 2: Lấy ra danh sách thông tin ID, Fullname, lớp thực tập viên có lớp 'VTI005'
+Bước 3: Sử dụng UNION để nối 2 kết quả ở bước 1 và 2 */
+
+-- Bước 1
+SELECT 	TraineeID,Full_Name,Training_Class
+FROM 	Trainee
+WHERE	Training_Class = 'VTI002';
+ -- Bước 2 
+ SELECT TraineeID,Full_Name,Training_Class
+ FROM	Trainee
+ WHERE	Training_Class = 'VTI003';
+ 
+-- Bước 3
+SELECT 	TraineeID,Full_Name,Training_Class
+FROM 	Trainee
+WHERE 	Training_Class ='VTI002'
+UNION
+SELECT 	TraineeID,Full_Name,Training_Class
+FROM 	Trainee
+WHERE	Training_Class ='VTI003';
